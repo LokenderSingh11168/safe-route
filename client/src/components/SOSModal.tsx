@@ -14,20 +14,7 @@ export const SOSModal: React.FC = () => {
     };
 
     useEffect(() => {
-        // Auto-trigger actions immediately when SOS is activated!
-        if (sosActive && emergencyContacts.length > 0) {
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            const primaryContact = emergencyContacts[0];
-            
-            if (isMobile) {
-                // Mobile: Normal phone call automatically
-                window.location.href = `tel:${primaryContact}`;
-            } else {
-                // Laptop/Desktop: WhatsApp directly with live location
-                const text = `🚨 EMERGENCY SOS! I need help immediately. Here is my live location: ${generateMapsUrl()}`;
-                window.open(`https://wa.me/${primaryContact.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`, '_blank');
-            }
-        } else if (sosActive && emergencyContacts.length === 0) {
+        if (sosActive && emergencyContacts.length === 0) {
             // If they have no contacts, prompt them!
             cancelSosFlow();
             setContactsModalOpen(true);
