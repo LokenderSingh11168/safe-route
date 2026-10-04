@@ -61,8 +61,10 @@ export const Map: React.FC = () => {
     const { routes, selectedRouteIndex, currentLocation, theme } = useStore();
     const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
     
-    // Fallback to CartoDB dark/light tiles if Mapbox token is not set
-    const mapboxStyle = theme === 'light' ? 'streets-v11' : 'dark-v11';
+    // Use Mapbox Navigation styles which have blue water in dark mode and clear highway (NH) shields
+    const mapboxStyle = theme === 'light' ? 'navigation-day-v1' : 'navigation-night-v1';
+    
+    // Fallback to CartoDB tiles if Mapbox token is not set (Note: Carto Dark is strictly greyscale)
     const cartoStyle = theme === 'light' ? 'rastertiles/voyager' : 'dark_all';
     
     const tileUrl = mapboxToken && mapboxToken !== 'your_mapbox_token_here' 
