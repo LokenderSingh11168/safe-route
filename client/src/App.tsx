@@ -4,7 +4,7 @@ import { SOSModal } from './components/SOSModal';
 import { ContactsModal } from './components/ContactsModal';
 import { OnboardingModal } from './components/OnboardingModal';
 import { useStore } from './store';
-import { Search, AlertTriangle, ShieldCheck, Camera, X, ShieldAlert, Settings, Moon, Sun } from 'lucide-react';
+import { AlertTriangle, ShieldCheck, Camera, X, ShieldAlert, Settings, Moon, Sun } from 'lucide-react';
 import { scoreRoute, submitReport } from './api';
 
 const PlaceAutocomplete: React.FC<{
