@@ -14,7 +14,51 @@ export const SOSModal: React.FC = () => {
     };
 
     useEffect(() => {
-        if (sosActive && emergencyContacts.length === 0) {
+        if (sosActive && emergencyContacts.length > 0) {
+            const primaryContact = emergencyContacts[0];
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            
+            // 1. Immediately trigger the phone call (this opens dialer and leaves browser running in background)
+            if (isMobile) {
+                window.location.href = `tel:${primaryContact}`;
+            }
+
+            // 2. Fetch fresh location and send WhatsApp message
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    const mapsUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+                    const text = `🚨 EMERGENCY SOS! I need help immediately. Here is my live location: ${mapsUrl}`;
+                    const whatsappUrl = `https://wa.me/${primaryContact.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`;
+                    
+                    // Open WhatsApp automatically
+                    if (isMobile) {
+                        // Slight delay so the dialer has time to open first
+                        setTimeout(() => {
+                            window.location.href = whatsappUrl;
+                        }, 1500);
+                    } else {
+                        window.open(whatsappUrl, '_blank');
+                    }
+                },
+                (_err) => {
+                    // Fallback if location fails
+                    const text = `🚨 EMERGENCY SOS! I need help immediately. (Location could not be determined)`;
+                    const whatsappUrl = `https://wa.me/${primaryContact.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`;
+                    
+                    if (isMobile) {
+                        setTimeout(() => {
+                            window.location.href = whatsappUrl;
+                        }, 1500);
+                    } else {
+                        window.open(whatsappUrl, '_blank');
+                    }
+                },
+                { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+            );
+
+        } else if (sosActive && emergencyContacts.length === 0) {
             // If they have no contacts, prompt them!
             cancelSosFlow();
             setContactsModalOpen(true);
