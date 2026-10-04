@@ -18,45 +18,31 @@ export const SOSModal: React.FC = () => {
             const primaryContact = emergencyContacts[0];
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
             
-            // 1. Immediately trigger the phone call (this opens dialer and leaves browser running in background)
-            if (isMobile) {
-                window.location.href = `tel:${primaryContact}`;
+            // 1. Get location (use cached location for zero delay!)
+            let mapsUrl = 'Location not available yet.';
+            if (currentLocation) {
+                mapsUrl = `https://www.google.com/maps?q=${currentLocation.lat},${currentLocation.lon}`;
             }
-
-            // 2. Fetch fresh location and send WhatsApp message
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    const lat = pos.coords.latitude;
-                    const lon = pos.coords.longitude;
-                    const mapsUrl = `https://www.google.com/maps?q=${lat},${lon}`;
-                    const text = `🚨 EMERGENCY SOS! I need help immediately. Here is my live location: ${mapsUrl}`;
-                    const whatsappUrl = `https://wa.me/${primaryContact.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`;
-                    
-                    // Open WhatsApp automatically
-                    if (isMobile) {
-                        // Slight delay so the dialer has time to open first
-                        setTimeout(() => {
-                            window.location.href = whatsappUrl;
-                        }, 1500);
-                    } else {
-                        window.open(whatsappUrl, '_blank');
-                    }
-                },
-                (_err) => {
-                    // Fallback if location fails
-                    const text = `🚨 EMERGENCY SOS! I need help immediately. (Location could not be determined)`;
-                    const whatsappUrl = `https://wa.me/${primaryContact.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`;
-                    
-                    if (isMobile) {
-                        setTimeout(() => {
-                            window.location.href = whatsappUrl;
-                        }, 1500);
-                    } else {
-                        window.open(whatsappUrl, '_blank');
-                    }
-                },
-                { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
-            );
+            
+            const text = `🚨 EMERGENCY SOS! I need help immediately. Here is my live location: ${mapsUrl}`;
+            const whatsappUrl = `https://wa.me/${primaryContact.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`;
+            
+            if (isMobile) {
+                // Genius hack to do both simultaneously on mobile:
+                // Trigger the phone dialer via a hidden iframe so it doesn't navigate away from the page
+                const iframe = document.createElement('iframe');
+                iframe.src = `tel:${primaryContact}`;
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                
+                // Immediately redirect the main browser window to WhatsApp
+                setTimeout(() => {
+                    window.location.href = whatsappUrl;
+                }, 300);
+            } else {
+                // On desktop, just open WhatsApp Web automatically
+                window.open(whatsappUrl, '_blank');
+            }
 
         } else if (sosActive && emergencyContacts.length === 0) {
             // If they have no contacts, prompt them!
