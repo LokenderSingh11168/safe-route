@@ -420,7 +420,7 @@ export const App: React.FC = () => {
             )}
             
             {/* Universal SOS Button - Center Bottom */}
-            <div className="absolute bottom-10 left-1/2" style={{ transform: 'translateX(-50%)', zIndex: 10000 }}>
+            <div className="absolute bottom-20 left-1/2" style={{ transform: 'translateX(-50%)', zIndex: 10000 }}>
                 <button 
                     className="sos-btn flex items-center justify-center gap-2 shadow-lg"
                     style={{ width: 'auto', padding: '16px 32px', borderRadius: '32px' }}

@@ -179,6 +179,8 @@ body {
   position: relative;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 .map-container {
   width: 100%;
@@ -254,6 +256,7 @@ body {
 .absolute { position: absolute; }
 .relative { position: relative; }
 .bottom-10 { bottom: 40px; }
+.bottom-20 { bottom: 90px; }
 .top-4 { top: 16px; }
 .left-1\/2 { left: 50%; }
 .flex { display: flex; }
