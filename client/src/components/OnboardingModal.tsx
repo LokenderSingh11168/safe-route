@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ShieldCheck, MapPin, Users, CheckCircle } from 'lucide-react';
 import { useStore } from '../store';
 
@@ -15,7 +15,7 @@ export const OnboardingModal: React.FC = () => {
                     // Success!
                     setStep(1);
                 },
-                (err) => {
+                (_err) => {
                     alert("Location access was denied. The app cannot function correctly without it.");
                     // Let them proceed anyway or retry, we'll just advance to contacts setup for now
                     setStep(1);

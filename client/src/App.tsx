@@ -174,7 +174,7 @@ export const App: React.FC = () => {
                         return { text: title + (subtitle ? `, ${subtitle}` : ''), lat: s.geometry.coordinates[1], lon: s.geometry.coordinates[0] };
                     }
                     if (mapboxData.features && mapboxData.features.length > 0) {
-                        const s = mapboxData.features[0];
+                        const s: any = mapboxData.features[0];
                         return { text: s.place_name, lat: s.center[1], lon: s.center[0] };
                     }
                 } catch (e) {
@@ -466,7 +466,7 @@ const ReportModal: React.FC = () => {
                     setStatus('Failed to submit');
                 }
             },
-            (err) => {
+            (_err) => {
                 setStatus('Location required to submit report.');
             }
         );
