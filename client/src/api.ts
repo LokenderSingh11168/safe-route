@@ -36,9 +36,9 @@ export const scoreRoute = async (polyline: string, duration: number, distance: n
     } catch (e) {
         console.warn("Backend not reachable for scoring. Returning mock safe score.");
         return {
-            riskScore: Math.floor(Math.random() * 30), // Safe mock score
-            safetyRating: 'A',
-            hazardsOnRoute: []
+            safetyScore: 95,
+            riskLevel: 'Low',
+            flaggedSegments: []
         };
     }
 };
