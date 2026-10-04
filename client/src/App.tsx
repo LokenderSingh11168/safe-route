@@ -4,15 +4,16 @@ import { SOSModal } from './components/SOSModal';
 import { ContactsModal } from './components/ContactsModal';
 import { OnboardingModal } from './components/OnboardingModal';
 import { useStore } from './store';
-import { AlertTriangle, ShieldCheck, Camera, X, ShieldAlert, Settings, Moon, Sun } from 'lucide-react';
+import { AlertTriangle, ShieldCheck, Camera, X, ShieldAlert, Settings, Moon, Sun, LocateFixed } from 'lucide-react';
 import { scoreRoute, submitReport } from './api';
 
 const PlaceAutocomplete: React.FC<{
     placeholder: string, 
     value: string, 
     onChange: (val: string) => void, 
-    onSelect: (loc: {text: string, lat: number, lon: number}) => void 
-}> = ({ placeholder, value, onChange, onSelect }) => {
+    onSelect: (loc: {text: string, lat: number, lon: number}) => void,
+    onUseLocation?: () => void
+}> = ({ placeholder, value, onChange, onSelect, onUseLocation }) => {
     const [suggestions, setSuggestions] = useState<any[]>([]);
     const [show, setShow] = useState(false);
     const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
@@ -65,18 +66,41 @@ const PlaceAutocomplete: React.FC<{
 
     return (
         <div className="autocomplete-wrapper">
-            <input 
-                type="text" 
-                className="input" 
-                placeholder={placeholder} 
-                value={value} 
-                onChange={(e) => {
-                    onChange(e.target.value);
-                    setShow(true);
-                }} 
-                onFocus={() => setShow(true)}
-                onBlur={() => setTimeout(() => setShow(false), 200)} // delay to allow click
-            />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input 
+                    type="text" 
+                    className="input" 
+                    placeholder={placeholder} 
+                    value={value} 
+                    onChange={(e) => {
+                        onChange(e.target.value);
+                        setShow(true);
+                    }} 
+                    onFocus={() => setShow(true)}
+                    onBlur={() => setTimeout(() => setShow(false), 200)} // delay to allow click
+                    style={onUseLocation ? { paddingRight: '40px' } : {}}
+                />
+                {onUseLocation && (
+                    <button 
+                        onClick={onUseLocation}
+                        title="Use My Location"
+                        style={{
+                            position: 'absolute',
+                            right: '8px',
+                            background: 'transparent',
+                            border: 'none',
+                            color: 'var(--accent-blue)',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '4px'
+                        }}
+                    >
+                        <LocateFixed size={20} />
+                    </button>
+                )}
+            </div>
             {show && suggestions.length > 0 && (
                 <div className="autocomplete-dropdown">
                     {suggestions.map((s: any, i: number) => {
@@ -120,11 +144,7 @@ export const App: React.FC = () => {
                     const heading = pos.coords.heading; // Direction user is travelling
                     setCurrentLocation({ lat, lon, heading });
                     
-                    // Only auto-set origin to My Location if we aren't currently navigating and haven't manually set one
-                    setOrigin((prev) => {
-                        if (!prev.lat || prev.text === 'My Location') return { text: 'My Location', lat, lon };
-                        return prev;
-                    });
+                    // Removed forceful overriding of 'My Location' so user can freely type!
 
                     // If navigating, we could dynamically calculate distance to next step here, 
                     // but for now we just track the location on the map natively.
@@ -333,6 +353,7 @@ export const App: React.FC = () => {
                             value={origin.text} 
                             onChange={(text) => setOrigin({ text })}
                             onSelect={(loc) => setOrigin(loc)}
+                            onUseLocation={currentLocation ? () => setOrigin({ text: 'My Current Location', lat: currentLocation.lat, lon: currentLocation.lon }) : undefined}
                         />
                         <PlaceAutocomplete 
                             placeholder="Destination (e.g. India Gate)" 
